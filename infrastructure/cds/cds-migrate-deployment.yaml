@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.26.0 (40646f47)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: cds-migrate
+  name: cds-migrate
+  namespace: cds
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: cds-migrate
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.26.0 (40646f47)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: cds-migrate
+    spec:
+      containers:
+        - args:
+            - sh
+            - -c
+            - ' /app/cds-engine-linux-amd64 database upgrade --db-host 10-244-1-67.cds.pod.cluster.local --db-user cds --db-password cds --db-name cds --db-schema public --db-sslmode disable --migrate-dir /app/sql/api; /app/cds-engine-linux-amd64 database upgrade --db-host cds-db --db-user cds --db-password cds --db-name cds --db-schema cdn --db-sslmode disable --migrate-dir /app/sql/cdn;'
+          image: ovhcom/cds-engine:latest
+          name: cds-migrate
+          resources: {}
+      restartPolicy: Always
+status: {}

@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.26.0 (40646f47)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: woodpecker-agent
+  name: woodpecker-agent
+  namespace: woodpecker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: woodpecker-agent
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.26.0 (40646f47)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: woodpecker-agent
+    spec:
+      containers:
+        - args:
+            - agent
+          env:
+            - name: WOODPECKER_AGENT_SECRET
+            - name: WOODPECKER_SERVER
+              value: woodpecker-server:9000
+          image: woodpeckerci/woodpecker-agent:latest
+          name: woodpecker-agent
+          resources: {}
+          volumeMounts:
+            - mountPath: /etc/woodpecker
+              name: woodpecker-agent-config
+            - mountPath: /var/run/docker.sock
+              name: woodpecker-agent-claim1
+      restartPolicy: Always
+      volumes:
+        - name: woodpecker-agent-config
+          persistentVolumeClaim:
+            claimName: woodpecker-agent-config
+        - name: woodpecker-agent-claim1
+          persistentVolumeClaim:
+            claimName: woodpecker-agent-claim1
+status: {}

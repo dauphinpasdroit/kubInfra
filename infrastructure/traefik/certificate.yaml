@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: nginx-cert-staging
+  namespace: traefik
+spec:
+  commonName: dashboard.cap.pernod-ricard.app
+  secretName: nginx-cert-staging
+  dnsNames:
+    - dashboard.cap.pernod-ricard.app
+  issuerRef:
+    kind: Issuer
+    name: letsencrypt-staging

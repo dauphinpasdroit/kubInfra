@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.26.0 (40646f47)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: cds-cdn
+  name: cds-cdn
+spec:
+  ports:
+    - name: "8089"
+      port: 8089
+      targetPort: 8089
+    - name: "8090"
+      port: 8090
+      targetPort: 8090
+  selector:
+    io.kompose.service: cds-cdn
+status:
+  loadBalancer: {}

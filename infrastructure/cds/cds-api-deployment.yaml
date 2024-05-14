@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.26.0 (40646f47)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: cds-api
+  name: cds-api
+  namespace: cds
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: cds-api
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.26.0 (40646f47)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: cds-api
+    spec:
+      containers:
+        - args:
+            - sh
+            - -c
+            - /app/cds-engine-linux-amd64 start api --config /app/conf/conf.toml
+          image: ovhcom/cds-engine:latest
+          livenessProbe:
+            exec:
+              command:
+                - curl
+                - -f
+                - http://127.0.0.1:8081/mon/version
+            failureThreshold: 6
+            periodSeconds: 30
+            timeoutSeconds: 10
+          name: cds-api
+          ports:
+            - containerPort: 8081
+          resources: {}
+          volumeMounts:
+            - mountPath: /app/artifacts
+              name: cds-artifacts-volume
+            - mountPath: /app/conf
+              name: cds-conf-volume
+      restartPolicy: Always
+      volumes:
+        - name: cds-artifacts-volume
+          persistentVolumeClaim:
+            claimName: cds-artifacts-volume
+        - name: cds-conf-volume
+          persistentVolumeClaim:
+            claimName: cds-conf-volume
+status: {}

@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.26.0 (40646f47)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: cds-hatchery-local
+  name: cds-hatchery-local
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: cds-hatchery-local
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.26.0 (40646f47)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: cds-hatchery-local
+    spec:
+      containers:
+        - args:
+            - sh
+            - -c
+            - /app/cds-engine-linux-amd64 start hatchery:local --config /app/conf/conf.toml
+          image: ovhcom/cds-engine:latest
+          livenessProbe:
+            exec:
+              command:
+                - curl
+                - -f
+                - http://127.0.0.1:8086/mon/version
+            failureThreshold: 6
+            periodSeconds: 30
+            timeoutSeconds: 10
+          name: cds-hatchery-local
+          ports:
+            - containerPort: 8086
+          resources: {}
+          volumeMounts:
+            - mountPath: /app/conf
+              name: cds-conf-volume
+            - mountPath: /app/hatchery-local
+              name: cds-hatchery-local-volume
+      restartPolicy: Always
+      volumes:
+        - name: cds-conf-volume
+          persistentVolumeClaim:
+            claimName: cds-conf-volume
+        - name: cds-hatchery-local-volume
+          persistentVolumeClaim:
+            claimName: cds-hatchery-local-volume
+status: {}

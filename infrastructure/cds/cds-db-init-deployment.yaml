@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.26.0 (40646f47)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: cds-db-init
+  name: cds-db-init
+  namespace: cds
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: cds-db-init
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.26.0 (40646f47)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: cds-db-init
+    spec:
+      containers:
+        - args:
+            - sh
+            - -exc
+            - PGPASSWORD=cds psql -h 10-244-1-67.cds.pod.cluster.local -p 5432 -U cds -d cds -c "CREATE SCHEMA IF NOT EXISTS cdn AUTHORIZATION cds;";
+          image: postgres:14.0
+          name: cds-db-init
+          resources: {}
+      restartPolicy: Always
+status: {}

@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.26.0 (40646f47)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: dockerhost
+  name: dockerhost
+  namespace: cds
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: dockerhost
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.26.0 (40646f47)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: dockerhost
+    spec:
+      containers:
+        - args:
+            - TCP4-LISTEN:2375,fork,reuseaddr
+            - UNIX-CONNECT:/var/run/docker.sock
+          image: bobrik/socat
+          name: dockerhost
+          ports:
+            - containerPort: 2375
+          resources: {}
+          volumeMounts:
+            - mountPath: /var/run/docker.sock
+              name: dockerhost-claim0
+      restartPolicy: Always
+      volumes:
+        - name: dockerhost-claim0
+          persistentVolumeClaim:
+            claimName: dockerhost-claim0
+status: {}

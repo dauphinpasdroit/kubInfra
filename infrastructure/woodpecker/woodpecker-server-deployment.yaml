@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.26.0 (40646f47)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: woodpecker-server
+  name: woodpecker-server
+  namespace: woodpecker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: woodpecker-server
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.26.0 (40646f47)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: woodpecker-server
+    spec:
+      containers:
+        - env:
+            - name: WOODPECKER_HOST
+              value: "https://woodpecker.kub.cap.pernod-ricard.app"
+            - name: WOODPECKER_GITHUB
+              value: "true"
+            - name: WOODPECKER_GITHUB_CLIENT_ID
+              value: "893086"
+            - name: WOODPECKER_GITHUB_CLIENT_SECRET
+              value: "eedc008a2b8b5c49f9bb382de87b29dfddf1783b"
+          image: woodpeckerci/woodpecker-server:latest
+          name: woodpecker-server
+          ports:
+            - containerPort: 8000
+          resources: {}
+          volumeMounts:
+            - mountPath: /var/lib/woodpecker/
+              name: woodpecker-server-data
+      restartPolicy: Always
+      volumes:
+        - name: woodpecker-server-data
+          persistentVolumeClaim:
+            claimName: woodpecker-server-data
+status: {}

@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.26.0 (40646f47)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: cds-cache
+  name: cds-cache
+  namespace: cds
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: cds-cache
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.26.0 (40646f47)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: cds-cache
+    spec:
+      containers:
+        - args:
+            - redis-server
+            - --requirepass
+            - cds
+            - --save
+            - "60"
+            - "1"
+          image: redis:alpine
+          name: cds-cache
+          resources: {}
+          volumeMounts:
+            - mountPath: /data
+              name: cds-redis-volume
+      restartPolicy: Always
+      volumes:
+        - name: cds-redis-volume
+          persistentVolumeClaim:
+            claimName: cds-redis-volume
+status: {}
